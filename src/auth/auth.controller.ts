@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -21,23 +22,25 @@ export class AuthController {
     return this.authService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('login')
+  login(@Body('email') email: string) {
+    return this.authService.login(email);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Post('verify-signup')
+  veriFySignUp(@Body('email') email: string, @Body('code') code: number) {
+    if (!email || !code)
+      throw new BadRequestException('please provide code or email');
+    return this.authService.veriFySignUp(email, code);
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  @Post('verifyLogin')
+  verifyLogin(@Body('email') email: string, @Body('code') code: number) {
+    if (!email || !code)
+      throw new BadRequestException('please provide code or email');
+    return this.authService.verifyLogin(email, code);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('resend-otp')
+  resendOtp(@Body('email') email: string) {
+    if (!email) throw new BadRequestException('please provide email');
+    return this.authService.resendOtp(email);
   }
 }
